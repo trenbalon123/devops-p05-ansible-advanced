@@ -1,0 +1,19 @@
+---
+- name: Demo vault, vars, debug verbosity and register
+  hosts: 10.0.2.16
+  remote_user: runner
+  become: true
+  gather_facts: true
+  vars_files:
+    - vault_vars.yml
+
+  tasks:
+    - name: Show decrypted vault variable (verbosity 1)
+      ansible.builtin.debug:
+        var: scanner_api_key
+        verbosity: 1
+
+    - name: Check host gateway via facts (when condition)
+      ansible.builtin.debug:
+        msg: "Host {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}, port={{ scan_port }}"
+      when: ansible_default_ipv4.gateway is defined

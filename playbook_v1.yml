@@ -1,0 +1,29 @@
+---
+- name: NMAP hosts from file and report
+  hosts: scanners
+  remote_user: runner
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install NMAP
+      ansible.builtin.apt:
+        name: nmap
+        state: present
+        update_cache: true
+
+    - name: Copy nmap targets list
+      ansible.builtin.copy:
+        src: ./targets.txt
+        dest: ~/targets.txt
+        force: true
+        mode: '0644'
+
+    - name: Run nmap
+      ansible.builtin.shell: "nmap -iL ~/targets.txt -p 80 -oG -"
+      register: nmap_result
+      changed_when: false
+
+    - name: Nmap output
+      ansible.builtin.debug:
+        msg: "{{ nmap_result.stdout_lines }}"
